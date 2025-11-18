@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cvcraft-app
+    container_name: cvcraft-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - cvcraft-network
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.1
+    container_name: cvcraft-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cvcraft
+      MYSQL_USER: cvcraft
+      MYSQL_PASSWORD: 1234
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - cvcraft-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: cvcraft-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - cvcraft-network
+    depends_on:
+      - app
+
+networks:
+  cvcraft-network:
+    driver: bridge
+
+volumes:
+  db_data:
