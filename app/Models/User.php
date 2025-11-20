@@ -20,6 +20,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'headline',
+        'bio',
         'password',
     ];
 
@@ -44,5 +46,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function cvs()
+    {
+        return $this->hasMany(Cv::class);
     }
 }
